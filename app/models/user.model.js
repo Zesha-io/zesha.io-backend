@@ -15,7 +15,7 @@ module.exports = (mongoose) => {
       },
       phone: String,
       verified_at: Date,
-      profileUrl: String,
+      profileAvatar: String,
       userType: {
         type: String,
         enum: ['VIEWER', 'CREATOR'],
@@ -30,11 +30,13 @@ module.exports = (mongoose) => {
       },
       userViewMode: {
         type: String,
-        enum: ['OVERLAY_MODE', 'FULL_MODE']
+        enum: ['OVERLAY_MODE', 'FULL_MODE'],
+        default: 'OVERLAY_MODE',
       },
       userFrequency: {
         type: String,
-        enum: ['LESS', 'BALANCED', 'MORE']
+        enum: ['LESS', 'BALANCED', 'MORE'],
+        default: 'MORE',
       }
     },
     { timestamps: true }
