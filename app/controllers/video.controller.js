@@ -39,7 +39,7 @@ module.exports = {
     },
     updateVideo: async (req, res) => {
         const { id } = req.params;
-        const { title, description, videoThumbnail, creatorId } = req.body;
+        const { title, description, publishStatus, videoThumbnail, creatorId } = req.body;
         try {
             let video = await Video.findOne({
                 _id: id, creatorId
@@ -54,6 +54,7 @@ module.exports = {
                   title,
                   description,
                   videoThumbnail,
+                  publishStatus
                 },
                 {
                   new: true,
