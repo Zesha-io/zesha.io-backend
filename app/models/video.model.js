@@ -27,7 +27,7 @@ module.exports = (mongoose) => {
       },
       videoShortLink: {
         type: String,
-        required: [true, 'short URL is required for video'],
+        required: [true, 'Short URL is required for video'],
       },
       forKids: {
         type: Boolean,

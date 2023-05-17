@@ -1,18 +1,18 @@
 const db = require("../models");
 
-const Users = db.users;
-const Wallets = db.wallets;
-const CreatorChannels = db.creatorchannels;
+const User = db.users;
+const Wallet = db.wallets;
+const CreatorChannel = db.creatorchannels;
 
 module.exports = {
     createUser: async (req, res) => {
         try {
             const { name, email, phone, profileAvatar, userType, walletAddress } = req.body;
-            const usercheck = await Users.findOne({ email });
+            const usercheck = await User.findOne({ email });
             if (usercheck)
-                return res.status(403).json({ status: false, msg: 'Email already exists' });
+                return res.status(403).json({ status: false, message: 'Email already exists' });
 
-            let user = new Users({
+            let user = new User({
                 name,
                 email,
                 phone,
@@ -23,7 +23,7 @@ module.exports = {
             user = await user.save(user);
             user = user.toJSON();
             // then create user's wallet and save in the database
-            let wallet = new Wallets({
+            let wallet = new Wallet({
                 walletAddress,
                 userId: user._id
             });
@@ -31,7 +31,7 @@ module.exports = {
             user.wallet = wallet;
             // if userType == creator, automatically create channel with the user's details
             if (userType === 'CREATOR') {
-                let creatorchannel = new CreatorChannels({
+                let creatorchannel = new CreatorChannel({
                     name: user.name,
                     description: `${user.name}'s channel on Zesha`,
                     channelAvatar: user.profileAvatar,
@@ -40,7 +40,7 @@ module.exports = {
                 creatorchannel = await creatorchannel.save(creatorchannel);
                 user.creatorchannel = creatorchannel;
             }
-            return res.send({
+            return res.json({
                 status: true,
                 data: user,
             });
@@ -56,7 +56,7 @@ module.exports = {
         const { name, phone, userInterests, userViewMode, userFrequency, channelName, channelDescription, channelLogo } = req.body;
         
         try {
-            let user = await Users.findOneAndUpdate(
+            let user = await User.findOneAndUpdate(
                 {
                   _id: id
                 },
@@ -79,14 +79,14 @@ module.exports = {
             }
             user = user.toJSON();
             // get wallet
-            let wallet = await Wallets.findOne({
+            let wallet = await Wallet.findOne({
                 userId: user._id
             });
             user.wallet = wallet;
 
             // update channel details if within request
             if (channelName && channelDescription && channelLogo) {
-                let creatorchannel = await CreatorChannels.findOneAndUpdate(
+                let creatorchannel = await CreatorChannel.findOneAndUpdate(
                     {
                         creatorId: user._id
                     },
@@ -101,12 +101,12 @@ module.exports = {
                 ).exec();
                 user.creatorchannel = creatorchannel;
             }
-            return res.send({
+            return res.json({
                 status: true,
                 data: user,
             });
         } catch (error) {
-            return res.status(500).send({
+            return res.status(500).json({
                 message:
                     error.message || `Some error occurred while saving user's profile.`,
             });
@@ -117,34 +117,34 @@ module.exports = {
         let user;
         try {
             if (by === 'email') {
-                user = await Users.findOne({ email }).exec();
+                user = await User.findOne({ email }).exec();
             } else if (by === 'id') {
-                user = await Users.findById(id).exec();
+                user = await User.findById(id).exec();
             } else {
-                return res.status(403).json({ status: false, msg: 'No parameters sent for getting user' });
+                return res.status(403).json({ status: false, message: 'No parameters sent for getting user' });
             }
             if (!user) {
-                return res.json({ status: false, msg: 'User does not exist' });
+                return res.json({ status: false, message: 'User does not exist' });
             }
             user = user.toJSON();
             // get wallet
-            let wallet = await Wallets.findOne({
+            let wallet = await Wallet.findOne({
                 userId: user._id
             });
             user.wallet = wallet;
             // get creator channel if user is creator
             if (user.userType === 'CREATOR') {
-                let creatorchannel = await CreatorChannels.findOne({
+                let creatorchannel = await CreatorChannel.findOne({
                     creatorId: user._id
                 });
                 if (!creatorchannel) {
-                    return res.json({ status: false, msg: 'Cannot find user creator channel' });
+                    return res.json({ status: false, message: 'Cannot find user creator channel' });
                 }
                 user.creatorchannel = creatorchannel;
             }
             return res.json({ status: true, data: user });
         } catch (error) {
-            return res.status(500).send({
+            return res.status(500).json({
                 status: false,
                 message: error.message || 'Error occured while retrieving user details.',
             });
