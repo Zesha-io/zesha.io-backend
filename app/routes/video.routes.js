@@ -9,6 +9,6 @@ router.get('/:id', video.getOneVideo);
 router.post('/:id', video.updateVideo);
 router.post('/:id/views', viewhistory.createVideoView);
 
-router.post('/:id/analytics', videoanalytics.getVideoAnalytics);
+router.get('/:id/analytics', videoanalytics.getVideoAnalytics);
 
 module.exports = router;

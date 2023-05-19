@@ -10,7 +10,7 @@ module.exports = (mongoose) => {
           enum: ['GIFT_CARD', 'CHARITY', 'WALLET'],
         },
         payoutMethodMetadata: {
-          type: Mixed
+          type: mongoose.Schema.Types.Mixed
         },
         zeshaFee: {
           type: Number,

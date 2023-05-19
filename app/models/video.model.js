@@ -33,16 +33,15 @@ module.exports = (mongoose) => {
         type: Boolean,
         default: false
       },
+      nftCollection: {
+        type: String
+      },
       tags: [
         {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Tag'
         }
       ],
-      uploadedAt: {
-        type: Date,
-        required: [true, 'Upload time is required for video'],
-      },
       lastEditedAt: {
         type: Date,
       },

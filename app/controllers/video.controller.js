@@ -8,7 +8,7 @@ const CreatorChannel = db.creatorchannels;
 
 module.exports = {
     createVideo: async (req, res) => {
-        const { title, description, videoUrl, videoThumbnail, videoLength, creatorId, channelId } = req.body;
+        const { title, description, videoUrl, videoThumbnail, videoLength, publishStatus, creatorId, channelId, nftCollection } = req.body;
         try {
             const videoShortLink = nanoid(15);
             let video = new Video({
@@ -18,8 +18,10 @@ module.exports = {
                 videoThumbnail,
                 videoLength,
                 videoShortLink,
+                publishStatus,
                 creator: creatorId,
-                channel: channelId
+                channel: channelId,
+                nftCollection
             });
             video = await video.save(video);
             video = await Video.findById(video._id).populate({
@@ -39,7 +41,7 @@ module.exports = {
     },
     updateVideo: async (req, res) => {
         const { id } = req.params;
-        const { title, description, publishStatus, videoThumbnail, creatorId } = req.body;
+        const { title, description, publishStatus, videoThumbnail, nftCollection, creatorId } = req.body;
         try {
             let video = await Video.findOne({
                 _id: id, creator: creatorId
@@ -51,15 +53,24 @@ module.exports = {
                   _id: id
                 },
                 {
-                  title,
-                  description,
-                  videoThumbnail,
-                  publishStatus
+                    $set: {
+                        title: title || undefined,
+                        description: description || undefined,
+                        videoThumbnail: videoThumbnail || undefined,
+                        publishStatus: publishStatus || undefined,
+                        nftCollection: nftCollection || undefined
+                    }
                 },
                 {
                   new: true,
                 }
-            ).exec();
+            ).populate({
+                path: 'creator',
+                model: User
+            }).populate({
+                path: 'channel',
+                model: CreatorChannel
+            }).exec();
             return res.json({ status: true, data: video });
         } catch (error) {
             return res.status(500).json({
