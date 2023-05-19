@@ -18,15 +18,15 @@ module.exports = {
                 videoThumbnail,
                 videoLength,
                 videoShortLink,
-                creatorId,
-                channelId
+                creator: creatorId,
+                channel: channelId
             });
             video = await video.save(video);
             video = await Video.findById(video._id).populate({
-                path: 'creatorId',
+                path: 'creator',
                 model: User
             }).populate({
-                path: 'channelId',
+                path: 'channel',
                 model: CreatorChannel
             });
             return res.json({ status: true, data: video });
@@ -42,7 +42,7 @@ module.exports = {
         const { title, description, publishStatus, videoThumbnail, creatorId } = req.body;
         try {
             let video = await Video.findOne({
-                _id: id, creatorId
+                _id: id, creator: creatorId
             });
             if (!video)
                 return res.status(404).json({ status: false, message: `Could not find video of ID ${id} and creator ID ${creatorId}` });
@@ -73,10 +73,10 @@ module.exports = {
         try {
             let video = await Video.findById(id)
             .populate({
-                path: 'creatorId',
+                path: 'creator',
                 model: User
             }).populate({
-                path: 'channelId',
+                path: 'channel',
                 model: CreatorChannel
             });
             if (!video)
@@ -93,12 +93,12 @@ module.exports = {
         const { id } = req.params;
         try {
             let videos = await Video.find({
-                creatorId: id
+                creator: id
             }).populate({
-                path: 'creatorId',
+                path: 'creator',
                 model: User
             }).populate({
-                path: 'channelId',
+                path: 'channel',
                 model: CreatorChannel
             });
             return res.json({ status: true, data: videos });
@@ -113,10 +113,10 @@ module.exports = {
         try {
             let videos = await Video.find()
             .populate({
-                path: 'creatorId',
+                path: 'creator',
                 model: User
             }).populate({
-                path: 'channelId',
+                path: 'channel',
                 model: CreatorChannel
             });
             return res.json({ status: true, data: videos });

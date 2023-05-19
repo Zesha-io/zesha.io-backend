@@ -14,7 +14,7 @@ module.exports = (mongoose) => {
         unique: true,
       },
       phone: String,
-      verified_at: Date,
+      verifiedAt: Date,
       profileAvatar: String,
       userType: {
         type: String,

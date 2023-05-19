@@ -1,5 +1,6 @@
 const userRoutes = require('./user.routes');
 const videoRoutes = require('./video.routes');
+const earningRoutes = require('./earning.routes');
 
 module.exports = (app) => {
   app.get('/api', (req, res) => {
@@ -8,4 +9,5 @@ module.exports = (app) => {
 
   app.use('/api/users', userRoutes);
   app.use('/api/videos', videoRoutes);
+  app.use('/api/earnings', earningRoutes);
 };

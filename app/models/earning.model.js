@@ -11,37 +11,33 @@ module.exports = (mongoose) => {
       viewerAmount: {
         type: Number,
       },
-      blockchainTrx: {
-        type: String,
-      },
       zeshaFee: {
         type: Number,
         // should it be percentage or total amount
       },
-      watchLength: {
-        type: Number
+      blockchainTrx: {
+        type: String,
       },
-      videoId: {
+      view: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ViewHistory'
+      },
+      video: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Video',
         required: true,
       },
-      creatorId: {
+      creator: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
       },
-      viewerId: {
+      viewer: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
       },
-      walletId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Wallet',
-        required: true,
-      },
-      extensionId: {
+      extension: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'UserExtension'
       }

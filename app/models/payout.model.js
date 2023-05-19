@@ -30,12 +30,12 @@ module.exports = (mongoose) => {
           type: String,
           required: true
         },
-        userId: {
+        user: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'User',
           required: true
         },
-        walletId: {
+        wallet: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Wallet',
           required: true,

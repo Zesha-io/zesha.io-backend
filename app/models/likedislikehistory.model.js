@@ -11,22 +11,22 @@ module.exports = (mongoose) => {
         actionDate: {
           type: Date
         },
-        viewerId: {
+        viewer: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'User',
           required: true,
         },
-        creatorId: {
+        creator: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'User',
           required: true,
         },
-        channelId: {
+        channel: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'CreatorChannel',
           required: true,
         },
-        videoId: {
+        video: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Video',
           required: true,

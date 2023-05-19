@@ -25,7 +25,7 @@ module.exports = {
             // then create user's wallet and save in the database
             let wallet = new Wallet({
                 walletAddress,
-                userId: user._id
+                user: user._id
             });
             wallet = await wallet.save(wallet);
             user.wallet = wallet;
@@ -35,7 +35,7 @@ module.exports = {
                     name: user.name,
                     description: `${user.name}'s channel on Zesha`,
                     channelAvatar: user.profileAvatar,
-                    creatorId: user._id,
+                    creator: user._id,
                 });
                 creatorchannel = await creatorchannel.save(creatorchannel);
                 user.creatorchannel = creatorchannel;
@@ -80,7 +80,7 @@ module.exports = {
             user = user.toJSON();
             // get wallet
             let wallet = await Wallet.findOne({
-                userId: user._id
+                user: user._id
             });
             user.wallet = wallet;
 
@@ -88,7 +88,7 @@ module.exports = {
             if (channelName && channelDescription && channelLogo) {
                 let creatorchannel = await CreatorChannel.findOneAndUpdate(
                     {
-                        creatorId: user._id
+                        creator: user._id
                     },
                     {
                         name: channelName,
@@ -129,13 +129,13 @@ module.exports = {
             user = user.toJSON();
             // get wallet
             let wallet = await Wallet.findOne({
-                userId: user._id
+                user: user._id
             });
             user.wallet = wallet;
             // get creator channel if user is creator
             if (user.userType === 'CREATOR') {
                 let creatorchannel = await CreatorChannel.findOne({
-                    creatorId: user._id
+                    creator: user._id
                 });
                 if (!creatorchannel) {
                     return res.json({ status: false, message: 'Cannot find user creator channel' });

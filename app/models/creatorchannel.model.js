@@ -10,7 +10,7 @@ module.exports = (mongoose) => {
         required: [true, 'Description is required for creator channel'],
       },
       channelAvatar: String,
-      creatorId: {
+      creator: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,

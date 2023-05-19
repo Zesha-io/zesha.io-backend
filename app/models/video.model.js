@@ -46,12 +46,12 @@ module.exports = (mongoose) => {
       lastEditedAt: {
         type: Date,
       },
-      creatorId: {
+      creator: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
       },
-      channelId: {
+      channel: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'CreatorChannel',
         required: true,
