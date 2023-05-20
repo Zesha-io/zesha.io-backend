@@ -60,9 +60,9 @@ module.exports = {
                 }
             ])
             return res.status(200).json({ status: true, data: {
-                totalvideoviews,
-                totaltimewatched,
-                totalearnings,
+                totalvideoviews: 10,
+                totaltimewatched: 500000,
+                totalearnings: 2000,
                 totalearningsgroupedbydate
             } });
         } catch (error) {
@@ -81,7 +81,17 @@ module.exports = {
             if (!video)
                 return res.status(404).json({ status: false, message: `Could not find video of ID ${id}` });
             // total views (distinct users)
-            let totalvideoviews = await ViewHistory.find({ video: video._id }).distinct('viewer').length;
+            let totalvideoviews = await ViewHistory.find({ video: video.id }).count();
+            let totalviewers = await ViewHistory.aggregate([
+                { $match: { video: video._id } },
+                {
+                    $group: {
+                        _id: "$viewer",
+                        totalviewers: { $sum: 1 }
+                    }
+                }
+            ]);
+            console.log(totalviewers)
             // total hours watched
             /* 
                 - https://stackoverflow.com/questions/39588588/mongoose-sum-a-value-across-all-documents
@@ -132,6 +142,7 @@ module.exports = {
             ])
             return res.status(200).json({ status: true, data: {
                 totalvideoviews,
+                totalviewers,
                 totaltimewatched,
                 totalearnings,
                 totalearningsgroupedbydate

@@ -8,7 +8,7 @@ const CreatorChannel = db.creatorchannels;
 
 module.exports = {
     createVideo: async (req, res) => {
-        const { title, description, videoUrl, videoThumbnail, videoLength, publishStatus, creatorId, channelId, nftCollection } = req.body;
+        const { title, description, videoUrl, videoThumbnail, videoLength, videoSize, publishStatus, creatorId, channelId, nftCollection } = req.body;
         try {
             const videoShortLink = nanoid(15);
             let video = new Video({
@@ -18,6 +18,7 @@ module.exports = {
                 videoThumbnail,
                 videoLength,
                 videoShortLink,
+                videoSize,
                 publishStatus,
                 creator: creatorId,
                 channel: channelId,
@@ -92,6 +93,16 @@ module.exports = {
             });
             if (!video)
                 return res.status(404).json({ status: false, message: `Could not find video of ID ${id}` });
+            video = video.toJSON();
+            video.totalvideoviews = 10;
+            video.totaluniqueviewers = 2;
+            video.totaltimewatched = 7200000;
+            video.totalearnings = 739;
+            video.totallikes = 10;
+            video.totaldislikes = 5;
+            video.viewsgroupedbydate = [];
+            video.timewatchedgroupedbydate = [];
+            video.likesdislikesbydate = [];
             return res.json({ status: true, data: video });
         } catch (error) {
             return res.status(500).json({
@@ -112,6 +123,7 @@ module.exports = {
                 path: 'channel',
                 model: CreatorChannel
             });
+            
             return res.json({ status: true, data: videos });
         } catch (error) {
             return res.status(500).json({

@@ -25,6 +25,7 @@ module.exports = (mongoose) => {
       videoLength: {
         type: String,
       },
+      videoSize: Number,
       videoShortLink: {
         type: String,
         required: [true, 'Short URL is required for video'],
