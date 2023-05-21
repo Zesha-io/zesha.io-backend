@@ -11,9 +11,10 @@ module.exports = {
         const VIEWER_AMOUNT = 0.1;
         const CREATOR_AMOUNT = 0.25;
         try {
-            let videoview = await ViewHistory.findById(viewId).populate({
-                path: 'video',
-                model: Video
+            let videoview = await ViewHistory.findOne({
+                _id: viewId,
+                viewer: viewerId,
+                video: videoId,
             });
             if (!videoview)
                 return res.status(404).json({ status: false, message: `Could not find view of ID ${viewId}` });
@@ -23,16 +24,16 @@ module.exports = {
                 video: videoId
             }).exec();
             if (pastearning)
-                return;
+                return res.status(200).json({ status: true, data: null });
             // create earning entry
             let newearning = new Earning({
                 adId,
                 viewerAmount: VIEWER_AMOUNT,
                 creatorAmount: CREATOR_AMOUNT,
                 video: videoId,
-                view: videoId,
-                creator: creatorId,
+                view: viewId,
                 viewer: viewerId,
+                creator: creatorId,
                 extension: extensionId,
                 blockchainTrx
             });

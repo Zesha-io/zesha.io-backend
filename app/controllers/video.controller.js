@@ -1,5 +1,6 @@
 const db = require("../models");
 const { nanoid } = require('nanoid');
+const { videoAnalyticsHelper } = require('./analytics.controller');
 
 const Video = db.videos;
 const User = db.users;
@@ -93,16 +94,14 @@ module.exports = {
             });
             if (!video)
                 return res.status(404).json({ status: false, message: `Could not find video of ID ${id}` });
+            let analytics = await videoAnalyticsHelper(video.id);
+            analytics.totallikes = 10;
+            analytics.totaldislikes = 5;
+            analytics.viewsgroupedbydate = [];
+            analytics.timewatchedgroupedbydate = [];
+            analytics.likesdislikesgroupedbydate = [];
             video = video.toJSON();
-            video.totalvideoviews = 10;
-            video.totaluniqueviewers = 2;
-            video.totaltimewatched = 7200000;
-            video.totalearnings = 739;
-            video.totallikes = 10;
-            video.totaldislikes = 5;
-            video.viewsgroupedbydate = [];
-            video.timewatchedgroupedbydate = [];
-            video.likesdislikesbydate = [];
+            video.analytics = analytics;
             return res.json({ status: true, data: video });
         } catch (error) {
             return res.status(500).json({

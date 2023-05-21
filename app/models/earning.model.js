@@ -2,7 +2,7 @@ module.exports = (mongoose) => {
   const schema = mongoose.Schema(
     {
       adId: {
-        type: Number,
+        type: String,
         required: true,
       },
       creatorAmount: {
