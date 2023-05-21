@@ -1,6 +1,6 @@
 const db = require("../models");
 const { nanoid } = require('nanoid');
-const { videoAnalyticsHelper } = require('./analytics.controller');
+const { videoAnalyticsHelper, multipleVideosAnalyticsHelper } = require('./analytics.controller');
 
 const Video = db.videos;
 const User = db.users;
@@ -116,8 +116,13 @@ module.exports = {
             }).populate({
                 path: 'channel',
                 model: CreatorChannel
-            });
-            
+            }).lean().exec();
+            // Map the docs into an array of just the _ids
+            const videoids = videos.map(function(doc) { return doc._id; });
+            // const videoanalytics = await multipleVideosAnalyticsHelper(videoids);
+            for (let video of videos) {
+                video.analytics = await videoAnalyticsHelper(video._id);
+            }
             return res.json({ status: true, data: videos });
         } catch (error) {
             return res.status(500).json({
@@ -135,7 +140,10 @@ module.exports = {
             }).populate({
                 path: 'channel',
                 model: CreatorChannel
-            });
+            }).lean().exec();
+            for (let video of videos) {
+                video.analytics = await videoAnalyticsHelper(video._id);
+            }
             return res.json({ status: true, data: videos });
         } catch (error) {
             return res.status(500).json({

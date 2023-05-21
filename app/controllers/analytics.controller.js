@@ -87,6 +87,61 @@ const videoAnalyticsHelper = async (videoId) => {
         throw new Error(error.message || `There was an error retrieving this video's analytics`)
     }
 };
+// receives array of video IDs
+const multipleVideosAnalyticsHelper = async (videoIds) => {
+    try {
+        //  (distinct viewers)
+        // let totalviewers = await ViewHistory.distinct('viewer', { video: videoId })
+        // totalviewers = totalviewers.length ? totalviewers.length : 0
+
+        // another method, but this one also returns the count for each viewer
+        const totalvideoviews = await ViewHistory.aggregate([
+            { $match: { video: { $in: videoIds } } },
+            {
+                $group: {
+                    _id: "$video",
+                    count: { $sum: 1 }
+                }
+            },
+        ]);
+
+        // total hours watched
+        let totaltimewatched = await ViewHistory.aggregate([
+            { $match: { video: { $in: videoIds } } },
+            {
+                $group: {
+                    _id: "$video",
+                    sum: { $sum: "$watchDuration" },
+                }
+            }
+        ]);
+        
+        // total earnings
+        let totalearnings = await Earning.aggregate([
+            { $match: { video: { $in: videoIds } } },
+            {
+                $group: {
+                    _id: "$video",
+                    total: { $sum: { $add: ["$viewerAmount", "$creatorAmount"] } },
+                    creator: { $sum: "$creatorAmount" },
+                    viewers: { $sum: "$viewerAmount" },
+                }
+            }
+        ])
+        /* totalvideoviews = videoIds.filter(function(id) {
+            return !totalvideoviews.some(function(view) {
+                return id === view._id;
+            })
+        }) */
+        return {
+            totalvideoviews,
+            totaltimewatched,
+            totalearnings
+        }
+    } catch (error) {
+        throw new Error(error.message || `There was an error retrieving analytics for these videos`)
+    }
+};
 
 module.exports = {
     getCreatorAnalytics: async (req, res) => {
@@ -181,5 +236,6 @@ module.exports = {
         }
     },
     getAllVideoAnalytics: async (req, res) => {},
-    videoAnalyticsHelper
+    videoAnalyticsHelper,
+    multipleVideosAnalyticsHelper
 };
