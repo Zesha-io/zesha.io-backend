@@ -95,11 +95,6 @@ module.exports = {
             if (!video)
                 return res.status(404).json({ status: false, message: `Could not find video of ID ${id}` });
             let analytics = await videoAnalyticsHelper(video.id);
-            analytics.totallikes = 10;
-            analytics.totaldislikes = 5;
-            analytics.viewsgroupedbydate = [];
-            analytics.timewatchedgroupedbydate = [];
-            analytics.likesdislikesgroupedbydate = [];
             video = video.toJSON();
             video.analytics = analytics;
             return res.json({ status: true, data: video });
