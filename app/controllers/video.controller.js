@@ -94,7 +94,7 @@ module.exports = {
             });
             if (!video)
                 return res.status(404).json({ status: false, message: `Could not find video of ID ${id}` });
-            let analytics = await videoAnalyticsHelper(video.id);
+            let analytics = await videoAnalyticsHelper(video._id);
             video = video.toJSON();
             video.analytics = analytics;
             return res.json({ status: true, data: video });

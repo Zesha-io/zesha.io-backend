@@ -69,6 +69,36 @@ const videoAnalyticsHelper = async (videoId) => {
                 }
             }
         ])
+        let viewsgroupedbydate = await ViewHistory.aggregate([
+            { 
+                $match: { 
+                    video: videoId,
+                    createdAt: { $gte: dayjs().subtract(1, 'month').toDate() }
+                }
+            },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    count: { $count: {} }
+                }
+            }
+        ])
+        viewsgroupedbydate = viewsgroupedbydate.length ? viewsgroupedbydate.map( Object.values ) : [];
+        let timewatchedgroupedbydate = await ViewHistory.aggregate([
+            { 
+                $match: { 
+                    video: videoId,
+                    createdAt: { $gte: dayjs().subtract(1, 'month').toDate() }
+                }
+            },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    sum: { $sum: "$watchDuration" },
+                }
+            }
+        ]);
+        timewatchedgroupedbydate = timewatchedgroupedbydate.length ? timewatchedgroupedbydate.map( Object.values ) : [];
         return {
             totalvideoviews,
             totalviewers,
@@ -78,9 +108,10 @@ const videoAnalyticsHelper = async (videoId) => {
             creatorandviewersearnings,
             totallikes: 10,
             totaldislikes: 5,
-            viewsgroupedbydate: [],
-            timewatchedgroupedbydate: [],
-            likesdislikesgroupedbydate: [],
+            viewsgroupedbydate,
+            timewatchedgroupedbydate,
+            likesgroupedbydate: [],
+            dislikesgroupedbydate: [],
             totalearningsgroupedbydate
         }
     } catch (error) {
