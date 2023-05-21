@@ -155,8 +155,11 @@ module.exports = {
             });
             if (!creator)
                 return res.status(404).json({ status: false, message: `Could not find creator of ID ${id}` });
-            // total views (distinct users)
-            let totalvideoviews = await ViewHistory.find({ creator: creator._id }).distinct('viewer').length;
+            // total views
+            let totalcreatorviews = await ViewHistory.find({ creator: creator._id }).count();
+            //  (distinct viewers)
+            let totalcreatorviewers = await ViewHistory.distinct('viewer', { creator: creator._id })
+            totalcreatorviewers = totalcreatorviewers.length ? totalcreatorviewers.length : 0
             // total hours watched
             /* 
                 - https://stackoverflow.com/questions/39588588/mongoose-sum-a-value-across-all-documents
@@ -167,22 +170,22 @@ module.exports = {
                 {
                     $group: {
                         _id: null,
-                        totaltimewatched: { $sum: "$watchDuration" },
+                        sum: { $sum: "$watchDuration" },
                     }
                 }
             ]);
+            totaltimewatched = totaltimewatched.length ? totaltimewatched[0].sum : 0
             // total earnings
             let totalearnings = await Earning.aggregate([
                 { $match: { creator: creator._id } },
                 {
                     $group: {
                         _id: null,
-                        totalearnings: { $sum: { $add: ["$viewerAmount", "$creatorAmount"] } },
-                        creatortotalearnings: { $sum: "$creatorAmount" },
-                        viewerstotalearnings: { $sum: "$viewerAmount" },
+                        sum: { $sum: "$creatorAmount" },
                     }
                 }
             ])
+            let totalcreatorearnings = totalearnings.length ? totalearnings[0].sum : 0
             // earnings grouped by week for the last 1 month
             /* 
                 - https://stackoverflow.com/questions/34610096/how-to-group-by-documents-by-week-in-mongodb
@@ -199,16 +202,15 @@ module.exports = {
                 {
                     $group: {
                         _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
-                        totalearnings: { $sum: { $add: ["$viewerAmount", "$creatorAmount"] } },
-                        creatortotalearnings: { $sum: "$creatorAmount" },
-                        viewerstotalearnings: { $sum: "$viewerAmount" },
+                        earnings: { $sum: "$creatorAmount" },
                     }
                 }
             ])
             return res.status(200).json({ status: true, data: {
-                totalvideoviews: 10,
-                totaltimewatched: 500000,
-                totalearnings: 2000,
+                totalcreatorviews,
+                totalcreatorviewers,
+                totaltimewatched,
+                totalcreatorearnings,
                 totalearningsgroupedbydate
             } });
         } catch (error) {
@@ -235,7 +237,6 @@ module.exports = {
             });
         }
     },
-    getAllVideoAnalytics: async (req, res) => {},
     videoAnalyticsHelper,
     multipleVideosAnalyticsHelper
 };
