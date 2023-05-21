@@ -8,9 +8,6 @@ module.exports = (mongoose) => {
           enum: ['LIKE', 'DISLIKE'],
           required: true,
         },
-        actionDate: {
-          type: Date
-        },
         viewer: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'User',

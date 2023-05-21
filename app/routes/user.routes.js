@@ -8,6 +8,6 @@ router.get('/', user.getUser);
 router.post('/:id', user.updateUserProfile);
 router.get('/:id/videos', video.getCreatorVideos);
 
-router.get('/:id/analytics', analytics.getCreatorAnalytics);
+router.get('/:id/analytics', analytics.getUserAnalytics);
 
 module.exports = router;

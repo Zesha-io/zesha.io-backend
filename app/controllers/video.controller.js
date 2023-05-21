@@ -5,6 +5,7 @@ const { videoAnalyticsHelper, multipleVideosAnalyticsHelper } = require('./analy
 const Video = db.videos;
 const User = db.users;
 const CreatorChannel = db.creatorchannels;
+const LikeDislikeHistory = db.likedislikehistories;
 
 
 module.exports = {
@@ -151,5 +152,54 @@ module.exports = {
                 message: error.message || 'Error occured while retrieving videos.',
             });
         }
+    },
+    likeDislikeVideo: async (req, res) => {
+        const { id } = req.params;
+        const { actionType, viewerId } = req.body;
+        try {
+            if (actionType === "LIKE" || actionType === "DISLIKE") {
+                let video = await Video.findById(id)
+                    .populate({
+                        path: 'creator',
+                        model: User
+                    }).populate({
+                        path: 'channel',
+                        model: CreatorChannel
+                    }).exec();
+                if (!video)
+                    return res.status(404).json({ status: false, message: `Could not find video of ID ${id}` });
+                let viewer = await User.findById(viewerId);
+                if (!viewer)
+                    return res.status(404).json({ status: false, message: `Could not find viewer of ID ${viewerId}` });
+                let action = await LikeDislikeHistory.findOneAndUpdate(
+                    {
+                        video: video.id,
+                        viewer: viewerId
+                    },
+                    {
+                        $set: {
+                            actionType,
+                            viewer: viewerId,
+                            creator: video.creator.id,
+                            channel: video.channel.id,
+                            video: video.id
+                        }
+                    },
+                    {
+                        new: true,
+                        upsert: true,
+                        setDefaultsOnInsert: true
+                    }
+                );
+                return res.json({ status: true, data: action });
+            } else {
+                return res.status(403).json({ status: false, message: 'Invalid action. Use either LIKE or DISLIKE' })
+            }
+        } catch (error) {
+            return res.status(500).json({
+                status: false,
+                message: error.message || 'Error occured while liking or disliking video.',
+            });
+        }   
     }
 };
