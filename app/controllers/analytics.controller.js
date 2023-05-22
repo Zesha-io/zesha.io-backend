@@ -83,7 +83,7 @@ const videoAnalyticsHelper = async (videoId) => {
             },
             {
                 $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    _id: { $toLong: "$createdAt" },
                     totalearnings: { $sum: { $add: ["$viewerAmount", "$creatorAmount"] } },
                     creatortotalearnings: { $sum: "$creatorAmount" },
                     viewerstotalearnings: { $sum: "$viewerAmount" },
@@ -99,7 +99,7 @@ const videoAnalyticsHelper = async (videoId) => {
             },
             {
                 $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    _id: { $toLong: "$createdAt" },
                     count: { $count: {} }
                 }
             }
@@ -114,7 +114,7 @@ const videoAnalyticsHelper = async (videoId) => {
             },
             {
                 $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    _id: { $toLong: "$createdAt" },
                     sum: { $sum: "$watchDuration" },
                 }
             }
@@ -130,7 +130,7 @@ const videoAnalyticsHelper = async (videoId) => {
             },
             {
                 $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    _id: { $toLong: "$createdAt" },
                     sum: { $count: {} },
                 }
             }
@@ -146,7 +146,7 @@ const videoAnalyticsHelper = async (videoId) => {
             },
             {
                 $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    _id: { $toLong: "$createdAt" },
                     sum: { $count: {} },
                 }
             }
@@ -287,7 +287,7 @@ module.exports = {
                     },
                     {
                         $group: {
-                            _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                            _id: { $toLong: "$createdAt" },
                             earnings: { $sum: "$creatorAmount" },
                         }
                     }
@@ -349,7 +349,7 @@ module.exports = {
                     },
                     {
                         $group: {
-                            _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                            _id: { $toDate:  "$createdAt" },
                             earnings: { $sum: "$viewerAmount" },
                         }
                     }
