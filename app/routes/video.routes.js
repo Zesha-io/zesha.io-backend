@@ -5,6 +5,7 @@ const analytics = require('../controllers/analytics.controller');
 
 router.post('/', video.createVideo);
 router.get('/', video.getAllVideos);
+router.get('/recommended', video.getRecommendedVideos);
 router.get('/:id', video.getOneVideo);
 router.post('/:id', video.updateVideo);
 router.post('/:id/views', viewhistory.createVideoView);

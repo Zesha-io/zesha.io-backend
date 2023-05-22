@@ -201,5 +201,21 @@ module.exports = {
                 message: error.message || 'Error occured while liking or disliking video.',
             });
         }   
-    }
+    },
+    getRecommendedVideos: async (req, res) => {
+        try {
+            let videos = await Video.aggregate([{ $sample: { size: 10 } }])
+            for (let video of videos) {
+                video.creator = await User.findById(video.creator);
+                video.channel = await CreatorChannel.findById(video.channel);
+                video.analytics = await videoAnalyticsHelper(video._id);
+            }
+            return res.json({ status: true, data: videos });
+        } catch (error) {
+            return res.status(500).json({
+                status: false,
+                message: error.message || 'Error occured while retrieving recommended videos.',
+            });
+        }
+    },
 };
