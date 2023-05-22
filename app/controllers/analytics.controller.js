@@ -369,7 +369,7 @@ module.exports = {
                         totaltimewatched,
                         totalcreatorearnings,
                         totalcreatorearningsgroupedbydate,
-                        walletbalance,
+                        walletbalance: Number(walletbalance),
                     },
                 });
             } else if (type === "VIEWER") {
@@ -452,7 +452,7 @@ module.exports = {
                         totaltimewatched,
                         totalviewerearnings,
                         totalviewerearningsgroupedbydate,
-                        walletbalance,
+                        walletbalance: Number(walletbalance),
                     },
                 });
             } else {
