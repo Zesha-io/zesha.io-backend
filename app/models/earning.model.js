@@ -8,14 +8,23 @@ module.exports = (mongoose) => {
       creatorAmount: {
         type: Number,
       },
+      creatorAmountUSD: {
+        type: Number,
+      },
       viewerAmount: {
+        type: Number,
+      },
+      viewerAmountUSD: {
         type: Number,
       },
       zeshaFee: {
         type: Number,
         // should it be percentage or total amount
       },
-      blockchainTrx: {
+      blockchainTrxCreator: {
+        type: String,
+      },
+      blockchainTrxViewer: {
         type: String,
       },
       view: {

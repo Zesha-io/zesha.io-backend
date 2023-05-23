@@ -5,6 +5,10 @@ module.exports = (mongoose) => {
           type: Number,
           required: true,
         },
+        amountUSD: {
+          type: Number,
+          required: true,
+        },
         payoutMethod: {
           type: String,
           enum: ['GIFT_CARD', 'CHARITY', 'WALLET'],
