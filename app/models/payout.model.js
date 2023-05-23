@@ -11,7 +11,8 @@ module.exports = (mongoose) => {
         },
         payoutMethod: {
           type: String,
-          enum: ['GIFT_CARD', 'CHARITY', 'WALLET'],
+          enum: ['GIFT_CARD', 'CHARITY', 'WALLET_TRANSFER'],
+          required: [true, 'Payment method is required'],
         },
         payoutMethodMetadata: {
           type: mongoose.Schema.Types.Mixed
