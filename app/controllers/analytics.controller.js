@@ -89,25 +89,6 @@ const videoAnalyticsHelper = async (videoId) => {
         let creatorandviewersearnings = totalearnings.length
             ? totalearnings[0].total
             : 0;
-        // earnings grouped by week for the last 1 month
-        let totalearningsgroupedbydate = await Earning.aggregate([
-            {
-                $match: {
-                    video: videoId,
-                    createdAt: { $gt: dayjs().subtract(1, "month").toDate() },
-                },
-            },
-            {
-                $group: {
-                    _id: { $toLong: "$createdAt" },
-                    totalearnings: {
-                        $sum: { $add: ["$viewerAmount", "$creatorAmount"] },
-                    },
-                    creatortotalearnings: { $sum: "$creatorAmount" },
-                    viewerstotalearnings: { $sum: "$viewerAmount" },
-                },
-            },
-        ]);
         let viewsgroupedbydate = await ViewHistory.aggregate([
             {
                 $match: {
@@ -178,6 +159,60 @@ const videoAnalyticsHelper = async (videoId) => {
         dislikesgroupedbydate = dislikesgroupedbydate.length
             ? dislikesgroupedbydate.map(Object.values)
             : [];
+        // earnings grouped by week for the last 1 month
+        let creatorearningsgroupedbydate = await Earning.aggregate([
+            {
+                $match: {
+                    video: videoId,
+                    createdAt: { $gt: dayjs().subtract(1, "month").toDate() },
+                },
+            },
+            {
+                $group: {
+                    _id: { $toLong: "$createdAt" },
+                    creatortotalearnings: { $sum: "$creatorAmount" },
+                },
+            },
+        ]);
+        creatorearningsgroupedbydate = creatorearningsgroupedbydate.length
+            ? creatorearningsgroupedbydate.map(Object.values)
+            : [];
+        let viewersearningsgroupedbydate = await Earning.aggregate([
+            {
+                $match: {
+                    video: videoId,
+                    createdAt: { $gt: dayjs().subtract(1, "month").toDate() },
+                },
+            },
+            {
+                $group: {
+                    _id: { $toLong: "$createdAt" },
+                    viewerstotalearnings: { $sum: "$viewerAmount" },
+                },
+            },
+        ]);
+        viewersearningsgroupedbydate = viewersearningsgroupedbydate.length
+            ? viewersearningsgroupedbydate.map(Object.values)
+            : [];
+        let creatorsandviewersearningsgroupedbydate = await Earning.aggregate([
+            {
+                $match: {
+                    video: videoId,
+                    createdAt: { $gt: dayjs().subtract(1, "month").toDate() },
+                },
+            },
+            {
+                $group: {
+                    _id: { $toLong: "$createdAt" },
+                    totalearnings: {
+                        $sum: { $add: ["$viewerAmount", "$creatorAmount"] },
+                    },
+                },
+            },
+        ]);
+        creatorsandviewersearningsgroupedbydate = creatorsandviewersearningsgroupedbydate.length
+            ? creatorsandviewersearningsgroupedbydate.map(Object.values)
+            : [];
         return {
             totalvideoviews,
             totalviewers,
@@ -191,7 +226,9 @@ const videoAnalyticsHelper = async (videoId) => {
             timewatchedgroupedbydate,
             likesgroupedbydate,
             dislikesgroupedbydate,
-            totalearningsgroupedbydate,
+            creatorearningsgroupedbydate,
+            viewersearningsgroupedbydate,
+            creatorsandviewersearningsgroupedbydate
         };
     } catch (error) {
         throw new Error(
@@ -563,7 +600,7 @@ module.exports = {
                     status: false,
                     message: `Could not find video of ID ${id}`,
                 });
-            let analytics = await videoAnalyticsHelper(video.id);
+            let analytics = await videoAnalyticsHelper(video._id);
             return res.status(200).json({ status: true, data: analytics });
         } catch (error) {
             return res.status(500).json({
