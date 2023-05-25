@@ -47,6 +47,10 @@ module.exports = {
                 creator: videoview.creator,
                 extension: extensionId,
             });
+
+            console.log("viewer", videoview.viewer);
+            console.log("creator", videoview.creator);
+
             newearning = await newearning.save(newearning);
             if (newearning) {
                 // DISCARD - add to creator and viewer's wallet balance
