@@ -19,21 +19,17 @@ module.exports = {
                 model: User,
             });
             if (!videoview)
-                return res
-                    .status(404)
-                    .json({
-                        status: false,
-                        message: `Could not find view of ID ${viewId}`,
-                    });
+                return res.status(404).json({
+                    status: false,
+                    message: `Could not find view of ID ${viewId}`,
+                });
             // don't create earning entry if viewer is a creator (any creator at all)
             if (videoview.viewer.userType === "CREATOR") {
-                return res
-                    .status(200)
-                    .json({
-                        status: false,
-                        data: null,
-                        message: `Viewer is a creator`,
-                    });
+                return res.status(200).json({
+                    status: false,
+                    data: null,
+                    message: `Viewer is a creator`,
+                });
             }
             // make sure the person hasn't earned on that specific video
             let pastearning = await Earning.findOne({
@@ -41,13 +37,11 @@ module.exports = {
                 video: videoview.video,
             }).exec();
             if (pastearning)
-                return res
-                    .status(200)
-                    .json({
-                        status: false,
-                        data: null,
-                        message: `Viewer has earned before on this video`,
-                    });
+                return res.status(200).json({
+                    status: false,
+                    data: null,
+                    message: `Viewer has earned before on this video`,
+                });
             // create earning entry
             let price = 0;
             let tfuelusdprice = await fetch(
@@ -68,8 +62,15 @@ module.exports = {
                 extension: extensionId,
             });
 
-            console.log("viewer", videoview.viewer._id);
-            console.log("creator", videoview.creator._id);
+            let viewerWallet = await Wallet.findOne({
+                user: videoview.viewer._id,
+            });
+            let creatorWallet = await Wallet.findOne({
+                user: videoview.creator._id,
+            });
+
+            console.log("viewerWallet", viewerWallet.walletAddress);
+            console.log("creatorWallet", creatorWallet.walletAddress);
 
             newearning = await newearning.save(newearning);
             if (newearning) {
@@ -97,12 +98,10 @@ module.exports = {
         try {
             let user = await User.findById(id);
             if (!user)
-                return res
-                    .status(404)
-                    .json({
-                        status: false,
-                        message: `Cannot find user of ID: ${id}`,
-                    });
+                return res.status(404).json({
+                    status: false,
+                    message: `Cannot find user of ID: ${id}`,
+                });
 
             let userearnings = [];
             if (user.userType === "CREATOR") {
