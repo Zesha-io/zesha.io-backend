@@ -35,7 +35,7 @@ module.exports = {
                 video: id
             });
             viewhistory = await viewhistory.save();
-            return res.json({ status: true, data: true })
+            return res.json({ status: true, data: viewhistory })
         } catch (error) {
             return res.status(500).json({
                 status: false,
