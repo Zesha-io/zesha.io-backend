@@ -463,13 +463,50 @@ module.exports = {
 
                 //Wallet Balance
                 let walletbalance = await getWalletBalance(wallet);
+
+                let viewerviewsgroupedbydate = await ViewHistory.aggregate([
+                    {
+                        $match: {
+                            viewer: viewer._id,
+                            createdAt: { $gte: dayjs().subtract(1, "month").toDate() },
+                        },
+                    },
+                    {
+                        $group: {
+                            _id: { $toLong: "$createdAt" },
+                            count: { $count: {} },
+                        },
+                    },
+                ]);
+                viewerviewsgroupedbydate = viewerviewsgroupedbydate.length
+                    ? viewerviewsgroupedbydate.map(Object.values)
+                    : [];
+                // time by date
+                let viewertimewatchedgroupedbydate = await ViewHistory.aggregate([
+                    {
+                        $match: {
+                            viewer: viewer._id,
+                            createdAt: { $gte: dayjs().subtract(1, "month").toDate() },
+                        },
+                    },
+                    {
+                        $group: {
+                            _id: { $toLong: "$createdAt" },
+                            sum: { $sum: "$watchDuration" },
+                        },
+                    },
+                ]);
+                viewertimewatchedgroupedbydate = viewertimewatchedgroupedbydate.length
+                    ? viewertimewatchedgroupedbydate.map(Object.values)
+                    : [];
+
                 // earnings grouped by week for the last 1 month
                 /* 
                     - https://stackoverflow.com/questions/34610096/how-to-group-by-documents-by-week-in-mongodb
                     - https://www.statology.org/mongodb-group-by-date/
                     - https://kb.objectrocket.com/mongo-db/how-to-use-mongoose-to-group-by-date-1210
                 */
-                let totalviewerearningsgroupedbydate = await Earning.aggregate([
+                let viewerearningsgroupedbydate = await Earning.aggregate([
                     {
                         $match: {
                             viewer: viewer._id,
@@ -480,18 +517,23 @@ module.exports = {
                     },
                     {
                         $group: {
-                            _id: { $toDate: "$createdAt" },
+                            _id: { $toLong: "$createdAt" },
                             earnings: { $sum: "$viewerAmount" },
                         },
                     },
                 ]);
+                viewerearningsgroupedbydate = viewerearningsgroupedbydate.length
+                    ? viewerearningsgroupedbydate.map(Object.values)
+                    : [];
                 return res.status(200).json({
                     status: true,
                     data: {
                         totalviewerviews,
                         totaltimewatched,
                         totalviewerearnings,
-                        totalviewerearningsgroupedbydate,
+                        viewerviewsgroupedbydate,
+                        viewertimewatchedgroupedbydate,
+                        viewerearningsgroupedbydate,
                         walletbalance: Number(walletbalance),
                     },
                 });
