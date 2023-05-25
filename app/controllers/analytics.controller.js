@@ -337,13 +337,48 @@ module.exports = {
                 let totalcreatorearnings = totalearnings.length
                     ? totalearnings[0].sum
                     : 0;
+                let creatorviewsgroupedbydate = await ViewHistory.aggregate([
+                    {
+                        $match: {
+                            creator: creator._id,
+                            createdAt: { $gte: dayjs().subtract(1, "month").toDate() },
+                        },
+                    },
+                    {
+                        $group: {
+                            _id: { $toLong: "$createdAt" },
+                            count: { $count: {} },
+                        },
+                    },
+                ]);
+                creatorviewsgroupedbydate = creatorviewsgroupedbydate.length
+                    ? creatorviewsgroupedbydate.map(Object.values)
+                    : [];
+                // time by date
+                let creatortimewatchedgroupedbydate = await ViewHistory.aggregate([
+                    {
+                        $match: {
+                            creator: creator._id,
+                            createdAt: { $gte: dayjs().subtract(1, "month").toDate() },
+                        },
+                    },
+                    {
+                        $group: {
+                            _id: { $toLong: "$createdAt" },
+                            sum: { $sum: "$watchDuration" },
+                        },
+                    },
+                ]);
+                creatortimewatchedgroupedbydate = creatortimewatchedgroupedbydate.length
+                    ? creatortimewatchedgroupedbydate.map(Object.values)
+                    : [];
                 // earnings grouped by week for the last 1 month
                 /* 
                     - https://stackoverflow.com/questions/34610096/how-to-group-by-documents-by-week-in-mongodb
                     - https://www.statology.org/mongodb-group-by-date/
                     - https://kb.objectrocket.com/mongo-db/how-to-use-mongoose-to-group-by-date-1210
                 */
-                let totalcreatorearningsgroupedbydate = await Earning.aggregate(
+                let creatorearningsgroupedbydate = await Earning.aggregate(
                     [
                         {
                             $match: {
@@ -361,8 +396,8 @@ module.exports = {
                         },
                     ]
                 );
-                totalcreatorearningsgroupedbydate = totalcreatorearningsgroupedbydate.length
-                    ? totalcreatorearningsgroupedbydate.map(Object.values)
+                creatorearningsgroupedbydate = creatorearningsgroupedbydate.length
+                    ? creatorearningsgroupedbydate.map(Object.values)
                     : [];
                 return res.status(200).json({
                     status: true,
@@ -371,7 +406,9 @@ module.exports = {
                         totalcreatorviewers,
                         totaltimewatched,
                         totalcreatorearnings,
-                        totalcreatorearningsgroupedbydate,
+                        creatorviewsgroupedbydate,
+                        creatortimewatchedgroupedbydate,
+                        creatorearningsgroupedbydate,
                         walletbalance: Number(walletbalance),
                     },
                 });
