@@ -1,5 +1,6 @@
 const db = require("../models");
 const fetch = require("node-fetch-commonjs");
+const { ethers } = require("ethers");
 
 const ViewHistory = db.viewhistories;
 const Video = db.videos;
@@ -79,9 +80,33 @@ module.exports = {
                     // Wallet.findOneAndUpdate({ user: videoview.viewer }, { $inc : {'walletBalance' : VIEWER_AMOUNT} }).exec(),
                     // Wallet.findOneAndUpdate({ user: videoview.creator }, { $inc : {'walletBalance' : CREATOR_AMOUNT} }).exec()
                 ]);
+
+                const p = new ethers.providers.JsonRpcProvider(
+                    "https://eth-rpc-api-testnet.thetatoken.org/rpc"
+                );
+
+                let signer = new ethers.Wallet(
+                    process.env.PAYER_PRIVATE_KEY,
+                    p
+                );
+                const tx = await signer.sendTransaction({
+                    to: viewerWallet.walletAddress,
+                    value: ethers.utils.parseEther("0.1"),
+                });
+                const receipt = await tx.wait();
+
+                console.log(receipt);
+
+                const tx2 = await signer.sendTransaction({
+                    to: creatorWallet.walletAddress,
+                    value: ethers.utils.parseEther("0.25"),
+                });
+                const receipt2 = await tx2.wait();
+
+                newearning.blockchainTrxViewer = receipt.transactionHash;
+                newearning.blockchainTrxCreator = receipt2.transactionHash;
+
                 /* TODO: add TFUEL to Wallet - real payment. add blockchainTrxCreator & blockchainTrxViewer to entry */
-                newearning.blockchainTrxCreator = "sample";
-                newearning.blockchainTrxViewer = "sample";
                 newearning = await newearning.save();
             }
             return res.status(200).json({ status: true, data: newearning });
