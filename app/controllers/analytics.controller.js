@@ -361,6 +361,9 @@ module.exports = {
                         },
                     ]
                 );
+                totalcreatorearningsgroupedbydate = totalcreatorearningsgroupedbydate.length
+                    ? totalcreatorearningsgroupedbydate.map(Object.values)
+                    : [];
                 return res.status(200).json({
                     status: true,
                     data: {
