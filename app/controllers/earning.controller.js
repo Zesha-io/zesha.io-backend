@@ -9,7 +9,7 @@ const User = db.users;
 
 module.exports = {
     createEarning: async (req, res) => {
-        const { adId, viewId, extensionId } = req.body;
+        const { adId, viewId } = req.body;
         // base currency - THETA
         const VIEWER_AMOUNT = 0.1;
         const CREATOR_AMOUNT = 0.25;
@@ -59,7 +59,6 @@ module.exports = {
                 view: viewId,
                 viewer: videoview.viewer,
                 creator: videoview.creator,
-                extension: extensionId,
             });
 
             let viewerWallet = await Wallet.findOne({
