@@ -94,8 +94,6 @@ module.exports = {
                 });
                 const receipt = await tx.wait();
 
-                console.log(receipt);
-
                 const tx2 = await signer.sendTransaction({
                     to: creatorWallet.walletAddress,
                     value: ethers.utils.parseEther("0.25"),

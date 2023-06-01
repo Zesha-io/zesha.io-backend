@@ -210,9 +210,10 @@ const videoAnalyticsHelper = async (videoId) => {
                 },
             },
         ]);
-        creatorsandviewersearningsgroupedbydate = creatorsandviewersearningsgroupedbydate.length
-            ? creatorsandviewersearningsgroupedbydate.map(Object.values)
-            : [];
+        creatorsandviewersearningsgroupedbydate =
+            creatorsandviewersearningsgroupedbydate.length
+                ? creatorsandviewersearningsgroupedbydate.map(Object.values)
+                : [];
         return {
             totalvideoviews,
             totalviewers,
@@ -228,7 +229,7 @@ const videoAnalyticsHelper = async (videoId) => {
             dislikesgroupedbydate,
             creatorearningsgroupedbydate,
             viewersearningsgroupedbydate,
-            creatorsandviewersearningsgroupedbydate
+            creatorsandviewersearningsgroupedbydate,
         };
     } catch (error) {
         throw new Error(
@@ -305,6 +306,8 @@ const getWalletBalance = async (wallet) => {
 
     balance = await provider.getBalance(wallet?.walletAddress || "0x0");
 
+    console.log(balance.toString(), "BALANCE", wallet?.walletAddress);
+
     return Number(ethers.utils.formatEther(balance)).toFixed(2);
 };
 
@@ -378,7 +381,9 @@ module.exports = {
                     {
                         $match: {
                             creator: creator._id,
-                            createdAt: { $gte: dayjs().subtract(1, "month").toDate() },
+                            createdAt: {
+                                $gte: dayjs().subtract(1, "month").toDate(),
+                            },
                         },
                     },
                     {
@@ -392,50 +397,53 @@ module.exports = {
                     ? creatorviewsgroupedbydate.map(Object.values)
                     : [];
                 // time by date
-                let creatortimewatchedgroupedbydate = await ViewHistory.aggregate([
-                    {
-                        $match: {
-                            creator: creator._id,
-                            createdAt: { $gte: dayjs().subtract(1, "month").toDate() },
-                        },
-                    },
-                    {
-                        $group: {
-                            _id: { $toLong: "$createdAt" },
-                            sum: { $sum: "$watchDuration" },
-                        },
-                    },
-                ]);
-                creatortimewatchedgroupedbydate = creatortimewatchedgroupedbydate.length
-                    ? creatortimewatchedgroupedbydate.map(Object.values)
-                    : [];
-                // earnings grouped by week for the last 1 month
-                /* 
-                    - https://stackoverflow.com/questions/34610096/how-to-group-by-documents-by-week-in-mongodb
-                    - https://www.statology.org/mongodb-group-by-date/
-                    - https://kb.objectrocket.com/mongo-db/how-to-use-mongoose-to-group-by-date-1210
-                */
-                let creatorearningsgroupedbydate = await Earning.aggregate(
-                    [
+                let creatortimewatchedgroupedbydate =
+                    await ViewHistory.aggregate([
                         {
                             $match: {
                                 creator: creator._id,
                                 createdAt: {
-                                    $gt: dayjs().subtract(1, "month").toDate(),
+                                    $gte: dayjs().subtract(1, "month").toDate(),
                                 },
                             },
                         },
                         {
                             $group: {
                                 _id: { $toLong: "$createdAt" },
-                                earnings: { $sum: "$creatorAmount" },
+                                sum: { $sum: "$watchDuration" },
                             },
                         },
-                    ]
-                );
-                creatorearningsgroupedbydate = creatorearningsgroupedbydate.length
-                    ? creatorearningsgroupedbydate.map(Object.values)
-                    : [];
+                    ]);
+                creatortimewatchedgroupedbydate =
+                    creatortimewatchedgroupedbydate.length
+                        ? creatortimewatchedgroupedbydate.map(Object.values)
+                        : [];
+                // earnings grouped by week for the last 1 month
+                /* 
+                    - https://stackoverflow.com/questions/34610096/how-to-group-by-documents-by-week-in-mongodb
+                    - https://www.statology.org/mongodb-group-by-date/
+                    - https://kb.objectrocket.com/mongo-db/how-to-use-mongoose-to-group-by-date-1210
+                */
+                let creatorearningsgroupedbydate = await Earning.aggregate([
+                    {
+                        $match: {
+                            creator: creator._id,
+                            createdAt: {
+                                $gt: dayjs().subtract(1, "month").toDate(),
+                            },
+                        },
+                    },
+                    {
+                        $group: {
+                            _id: { $toLong: "$createdAt" },
+                            earnings: { $sum: "$creatorAmount" },
+                        },
+                    },
+                ]);
+                creatorearningsgroupedbydate =
+                    creatorearningsgroupedbydate.length
+                        ? creatorearningsgroupedbydate.map(Object.values)
+                        : [];
                 return res.status(200).json({
                     status: true,
                     data: {
@@ -505,7 +513,9 @@ module.exports = {
                     {
                         $match: {
                             viewer: viewer._id,
-                            createdAt: { $gte: dayjs().subtract(1, "month").toDate() },
+                            createdAt: {
+                                $gte: dayjs().subtract(1, "month").toDate(),
+                            },
                         },
                     },
                     {
@@ -519,23 +529,27 @@ module.exports = {
                     ? viewerviewsgroupedbydate.map(Object.values)
                     : [];
                 // time by date
-                let viewertimewatchedgroupedbydate = await ViewHistory.aggregate([
-                    {
-                        $match: {
-                            viewer: viewer._id,
-                            createdAt: { $gte: dayjs().subtract(1, "month").toDate() },
+                let viewertimewatchedgroupedbydate =
+                    await ViewHistory.aggregate([
+                        {
+                            $match: {
+                                viewer: viewer._id,
+                                createdAt: {
+                                    $gte: dayjs().subtract(1, "month").toDate(),
+                                },
+                            },
                         },
-                    },
-                    {
-                        $group: {
-                            _id: { $toLong: "$createdAt" },
-                            sum: { $sum: "$watchDuration" },
+                        {
+                            $group: {
+                                _id: { $toLong: "$createdAt" },
+                                sum: { $sum: "$watchDuration" },
+                            },
                         },
-                    },
-                ]);
-                viewertimewatchedgroupedbydate = viewertimewatchedgroupedbydate.length
-                    ? viewertimewatchedgroupedbydate.map(Object.values)
-                    : [];
+                    ]);
+                viewertimewatchedgroupedbydate =
+                    viewertimewatchedgroupedbydate.length
+                        ? viewertimewatchedgroupedbydate.map(Object.values)
+                        : [];
 
                 // earnings grouped by week for the last 1 month
                 /* 
